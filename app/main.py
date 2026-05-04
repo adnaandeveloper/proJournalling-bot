@@ -1,3 +1,7 @@
+import warnings
+from telegram.warnings import PTBUserWarning
+warnings.filterwarnings("ignore", category=PTBUserWarning)
+
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ConversationHandler, MessageHandler, filters
 from app.config import BOT_TOKEN
@@ -27,8 +31,7 @@ def main():
             trade_new.COMMENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, trade_new.comment)]
         },
         fallbacks=[],
-        per_user=True,
-        per_chat=True
+        per_user=True, per_chat=True, per_message=False
     )
 
     close_conv = ConversationHandler(
@@ -41,8 +44,7 @@ def main():
             trade_close.COMM: [MessageHandler(filters.TEXT & ~filters.COMMAND, trade_close.comm)]
         },
         fallbacks=[],
-        per_user=True,
-        per_chat=True
+        per_user=True, per_chat=True, per_message=False
     )
 
     acc_conv = ConversationHandler(
@@ -53,8 +55,7 @@ def main():
             accounts.BAL: [MessageHandler(filters.TEXT & ~filters.COMMAND, accounts.bal_given)]
         },
         fallbacks=[],
-        per_user=True,
-        per_chat=True
+        per_user=True, per_chat=True, per_message=False
     )
 
     cf_conv = ConversationHandler(
@@ -66,8 +67,7 @@ def main():
             cashflow.NOTE: [MessageHandler(filters.TEXT & ~filters.COMMAND, cashflow.note)]
         },
         fallbacks=[],
-        per_user=True,
-        per_chat=True
+        per_user=True, per_chat=True, per_message=False
     )
 
     edit_conv = ConversationHandler(
@@ -76,8 +76,7 @@ def main():
             accounts.EDIT: [MessageHandler(filters.TEXT & ~filters.COMMAND, accounts.edit_save)]
         },
         fallbacks=[],
-        per_user=True,
-        per_chat=True
+        per_user=True, per_chat=True, per_message=False
     )
 
     app.add_handler(new_conv)
@@ -92,7 +91,13 @@ def main():
     app.add_handler(CallbackQueryHandler(pairs.menu, pattern="^pairs$"))
     app.add_handler(CallbackQueryHandler(journal.show, pattern="^journal:"))
     app.add_handler(CallbackQueryHandler(journal.view, pattern="^view:"))
-    app.add_handler(CallbackQueryHandler(stats.show, pattern="^stats$"))
+
+    # FIX: stats.show findes ikke endnu – brug placeholder
+    async def stats_temp(update, context):
+        await update.callback_query.answer()
+        await update.callback_query.edit_message_text("📊 Stats kommer snart")
+    app.add_handler(CallbackQueryHandler(stats_temp, pattern="^stats$"))
+
     app.add_handler(CallbackQueryHandler(start.back_menu, pattern="^menu$"))
     app.add_handler(CallbackQueryHandler(lambda u, c: admin.menu(u, c), pattern="^admin$"))
     app.add_handler(CallbackQueryHandler(lambda u, c: start.back_menu(u, c), pattern="^lang$"))
