@@ -2,7 +2,19 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 from app.config import BOT_TOKEN
 from app.db.database import init_db
 from app.handlers import start, trade_new, trade_close, accounts, pairs, journal, cashflow, stats, admin
+import os
+
 def main():
+    # --- DEBUG: se hvad Railway sender ---
+    print("=== TOKEN CHECK ===")
+    print("BOT_TOKEN sat?", bool(BOT_TOKEN))
+    print("Længde:", len(BOT_TOKEN) if BOT_TOKEN else 0)
+    print("Starter med:", BOT_TOKEN[:6] + "..." if BOT_TOKEN else "INGEN")
+    print("===================")
+    
+    if not BOT_TOKEN or ":" not in BOT_TOKEN:
+        raise RuntimeError("STOP: BOT_TOKEN mangler i Railway Variables. Gå til Variables → tilføj BOT_TOKEN")
+
     init_db()
     app=ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start",start.start))
@@ -22,4 +34,5 @@ def main():
     app.add_handler(CallbackQueryHandler(lambda u,c: admin.menu(u,c),pattern="^admin$"))
     app.add_handler(CallbackQueryHandler(lambda u,c: start.back_menu(u,c),pattern="^lang$"))
     app.run_polling()
+
 if __name__=="__main__": main()
