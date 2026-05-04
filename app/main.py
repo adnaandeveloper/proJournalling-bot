@@ -1,3 +1,4 @@
+from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ConversationHandler, MessageHandler, filters
 from app.config import BOT_TOKEN
 from app.db.database import init_db
@@ -25,7 +26,9 @@ def main():
             trade_new.RISK: [MessageHandler(filters.TEXT & ~filters.COMMAND, trade_new.risk)],
             trade_new.COMMENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, trade_new.comment)]
         },
-        fallbacks=[]
+        fallbacks=[],
+        per_user=True,
+        per_chat=True
     )
 
     close_conv = ConversationHandler(
@@ -37,7 +40,9 @@ def main():
             trade_close.PHOTO: [MessageHandler(filters.PHOTO | filters.COMMAND, trade_close.photo)],
             trade_close.COMM: [MessageHandler(filters.TEXT & ~filters.COMMAND, trade_close.comm)]
         },
-        fallbacks=[]
+        fallbacks=[],
+        per_user=True,
+        per_chat=True
     )
 
     acc_conv = ConversationHandler(
@@ -47,7 +52,9 @@ def main():
             accounts.NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, accounts.name_given)],
             accounts.BAL: [MessageHandler(filters.TEXT & ~filters.COMMAND, accounts.bal_given)]
         },
-        fallbacks=[]
+        fallbacks=[],
+        per_user=True,
+        per_chat=True
     )
 
     cf_conv = ConversationHandler(
@@ -58,16 +65,19 @@ def main():
             cashflow.AMT: [MessageHandler(filters.TEXT & ~filters.COMMAND, cashflow.amt)],
             cashflow.NOTE: [MessageHandler(filters.TEXT & ~filters.COMMAND, cashflow.note)]
         },
-        fallbacks=[]
+        fallbacks=[],
+        per_user=True,
+        per_chat=True
     )
 
-    # NY: edit balance conversation
     edit_conv = ConversationHandler(
         entry_points=[CallbackQueryHandler(accounts.edit_start, pattern="^accedit:")],
         states={
             accounts.EDIT: [MessageHandler(filters.TEXT & ~filters.COMMAND, accounts.edit_save)]
         },
-        fallbacks=[]
+        fallbacks=[],
+        per_user=True,
+        per_chat=True
     )
 
     app.add_handler(new_conv)
@@ -77,10 +87,8 @@ def main():
     app.add_handler(edit_conv)
 
     app.add_handler(CallbackQueryHandler(accounts.menu, pattern="^accounts$"))
-    # NY: delete handlers
     app.add_handler(CallbackQueryHandler(accounts.delete_start, pattern="^accdel:"))
     app.add_handler(CallbackQueryHandler(accounts.delete_ok, pattern="^accdelok:"))
-
     app.add_handler(CallbackQueryHandler(pairs.menu, pattern="^pairs$"))
     app.add_handler(CallbackQueryHandler(journal.show, pattern="^journal:"))
     app.add_handler(CallbackQueryHandler(journal.view, pattern="^view:"))
@@ -89,7 +97,7 @@ def main():
     app.add_handler(CallbackQueryHandler(lambda u, c: admin.menu(u, c), pattern="^admin$"))
     app.add_handler(CallbackQueryHandler(lambda u, c: start.back_menu(u, c), pattern="^lang$"))
 
-    app.run_polling()
+    app.run_polling(drop_pending_updates=True, allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
     main()
