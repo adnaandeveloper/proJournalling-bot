@@ -7,7 +7,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 from app.config import BOT_TOKEN
 from app.db.database import init_db
 from app.handlers import start, trade_new, trade_close, accounts, pairs, journal, cashflow, stats, admin
-
+import asyncio
 def main():
     if not BOT_TOKEN or ":" not in BOT_TOKEN:
         raise RuntimeError("BOT_TOKEN mangler i Railway Variables")
@@ -103,7 +103,7 @@ def main():
     app.add_handler(CallbackQueryHandler(start.back_menu, pattern="^menu$"))
     app.add_handler(CallbackQueryHandler(lambda u, c: admin.menu(u, c), pattern="^admin$"))
     app.add_handler(CallbackQueryHandler(lambda u, c: start.back_menu(u, c), pattern="^lang$"))
-
+asyncio.run(app.bot.delete_webhook(drop_pending_updates=True))
     app.run_polling(drop_pending_updates=True, allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
