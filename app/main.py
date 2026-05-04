@@ -7,14 +7,17 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 from app.config import BOT_TOKEN
 from app.db.database import init_db
 from app.handlers import start, trade_new, trade_close, accounts, pairs, journal, cashflow, stats, admin
-import asyncio
+
+async def post_init(application):
+    # sletter webhook og gamle updates – køres FØR polling
+    await application.bot.delete_webhook(drop_pending_updates=True)
 
 def main():
     if not BOT_TOKEN or ":" not in BOT_TOKEN:
         raise RuntimeError("BOT_TOKEN mangler i Railway Variables")
 
     init_db()
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app = ApplicationBuilder().token(BOT_TOKEN).post_init(post_init).build()
 
     app.add_handler(CommandHandler("start", start.start))
     app.add_handler(CommandHandler("adduser", admin.adduser))
@@ -105,8 +108,6 @@ def main():
     app.add_handler(CallbackQueryHandler(lambda u, c: admin.menu(u, c), pattern="^admin$"))
     app.add_handler(CallbackQueryHandler(lambda u, c: start.back_menu(u, c), pattern="^lang$"))
 
-    # FIX: skal være INDE i main, før polling
-    asyncio.run(app.bot.delete_webhook(drop_pending_updates=True))
     app.run_polling(drop_pending_updates=True, allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
