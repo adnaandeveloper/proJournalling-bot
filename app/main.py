@@ -61,12 +61,26 @@ def main():
         fallbacks=[]
     )
 
+    # NY: edit balance conversation
+    edit_conv = ConversationHandler(
+        entry_points=[CallbackQueryHandler(accounts.edit_start, pattern="^accedit:")],
+        states={
+            accounts.EDIT: [MessageHandler(filters.TEXT & ~filters.COMMAND, accounts.edit_save)]
+        },
+        fallbacks=[]
+    )
+
     app.add_handler(new_conv)
     app.add_handler(close_conv)
     app.add_handler(acc_conv)
     app.add_handler(cf_conv)
+    app.add_handler(edit_conv)
 
     app.add_handler(CallbackQueryHandler(accounts.menu, pattern="^accounts$"))
+    # NY: delete handlers
+    app.add_handler(CallbackQueryHandler(accounts.delete_start, pattern="^accdel:"))
+    app.add_handler(CallbackQueryHandler(accounts.delete_ok, pattern="^accdelok:"))
+
     app.add_handler(CallbackQueryHandler(pairs.menu, pattern="^pairs$"))
     app.add_handler(CallbackQueryHandler(journal.show, pattern="^journal:"))
     app.add_handler(CallbackQueryHandler(journal.view, pattern="^view:"))
