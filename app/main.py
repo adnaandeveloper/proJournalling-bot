@@ -88,11 +88,14 @@ def main():
     app.add_handler(CallbackQueryHandler(accounts.menu, pattern="^accounts$"))
     app.add_handler(CallbackQueryHandler(accounts.delete_start, pattern="^accdel:"))
     app.add_handler(CallbackQueryHandler(accounts.delete_ok, pattern="^accdelok:"))
+    # NYE LINJER – status knapper
+    app.add_handler(CallbackQueryHandler(accounts.status_menu, pattern="^accstat:"))
+    app.add_handler(CallbackQueryHandler(accounts.status_set, pattern="^setstat:"))
+    
     app.add_handler(CallbackQueryHandler(pairs.menu, pattern="^pairs$"))
     app.add_handler(CallbackQueryHandler(journal.show, pattern="^journal:"))
     app.add_handler(CallbackQueryHandler(journal.view, pattern="^view:"))
 
-    # FIX: stats.show findes ikke endnu – brug placeholder
     async def stats_temp(update, context):
         await update.callback_query.answer()
         await update.callback_query.edit_message_text("📊 Stats kommer snart")
