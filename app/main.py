@@ -30,7 +30,7 @@ def main():
             trade_new.RISK: [MessageHandler(filters.TEXT & ~filters.COMMAND, trade_new.risk)],
             trade_new.COMMENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, trade_new.comment)]
         },
-        fallbacks=[],
+        fallbacks=[CommandHandler("cancel", start.back_menu), CallbackQueryHandler(start.back_menu, pattern="^menu$")],
         per_user=True, per_chat=True, per_message=False
     )
 
@@ -43,7 +43,7 @@ def main():
             trade_close.PHOTO: [MessageHandler(filters.PHOTO | filters.COMMAND, trade_close.photo)],
             trade_close.COMM: [MessageHandler(filters.TEXT & ~filters.COMMAND, trade_close.comm)]
         },
-        fallbacks=[],
+        fallbacks=[CommandHandler("cancel", start.back_menu), CallbackQueryHandler(start.back_menu, pattern="^menu$")],
         per_user=True, per_chat=True, per_message=False
     )
 
@@ -54,7 +54,7 @@ def main():
             accounts.NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, accounts.name_given)],
             accounts.BAL: [MessageHandler(filters.TEXT & ~filters.COMMAND, accounts.bal_given)]
         },
-        fallbacks=[],
+        fallbacks=[CommandHandler("cancel", start.back_menu), CallbackQueryHandler(start.back_menu, pattern="^menu$")],
         per_user=True, per_chat=True, per_message=False
     )
 
@@ -66,7 +66,7 @@ def main():
             cashflow.AMT: [MessageHandler(filters.TEXT & ~filters.COMMAND, cashflow.amt)],
             cashflow.NOTE: [MessageHandler(filters.TEXT & ~filters.COMMAND, cashflow.note)]
         },
-        fallbacks=[],
+        fallbacks=[CommandHandler("cancel", start.back_menu), CallbackQueryHandler(start.back_menu, pattern="^menu$")],
         per_user=True, per_chat=True, per_message=False
     )
 
@@ -75,7 +75,7 @@ def main():
         states={
             accounts.EDIT: [MessageHandler(filters.TEXT & ~filters.COMMAND, accounts.edit_save)]
         },
-        fallbacks=[],
+        fallbacks=[CommandHandler("cancel", start.back_menu), CallbackQueryHandler(start.back_menu, pattern="^menu$")],
         per_user=True, per_chat=True, per_message=False
     )
 
@@ -88,7 +88,6 @@ def main():
     app.add_handler(CallbackQueryHandler(accounts.menu, pattern="^accounts$"))
     app.add_handler(CallbackQueryHandler(accounts.delete_start, pattern="^accdel:"))
     app.add_handler(CallbackQueryHandler(accounts.delete_ok, pattern="^accdelok:"))
-    # NYE LINJER – status knapper
     app.add_handler(CallbackQueryHandler(accounts.status_menu, pattern="^accstat:"))
     app.add_handler(CallbackQueryHandler(accounts.status_set, pattern="^setstat:"))
     
